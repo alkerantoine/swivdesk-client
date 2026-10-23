@@ -39,7 +39,7 @@ jobs:
         shell: bash
         run: |
           pushd flutter
-          flutter create --platforms=web .
+          flutter create --platforms=web --project-name flutter_hbb .
           popd
           ls flutter/web
 
