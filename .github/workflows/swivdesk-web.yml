@@ -1,0 +1,100 @@
+name: SwivDesk Web Client
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-web:
+    name: swivdesk-web
+    runs-on: ubuntu-22.04
+    env:
+      FLUTTER_VERSION: "3.24.5"
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Prepare env
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y wget npm
+
+      - name: Install flutter
+        uses: subosito/flutter-action@v2.12.0
+        with:
+          channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Patch flutter
+        shell: bash
+        run: |
+          cd $(dirname $(dirname $(which flutter)))
+          git apply ${{ github.workspace }}/.github/patches/flutter_3.24.4_dropdown_menu_enableFilter.diff
+
+      - name: Generate web scaffold
+        shell: bash
+        run: |
+          pushd flutter
+          flutter create --platforms=web .
+          popd
+          ls flutter/web
+
+      - name: Fetch web deps
+        shell: bash
+        run: |
+          pushd flutter/web
+          wget -q https://github.com/rustdesk/doc.rustdesk.com/releases/download/console/web_deps.tar.gz
+          tar xzf web_deps.tar.gz
+          rm -f web_deps.tar.gz
+          popd
+          ls flutter/web
+
+      - name: Build JS bridge (if sources present)
+        shell: bash
+        run: |
+          if [ -f flutter/web/js/package.json ]; then
+            sudo npm install -g yarn typescript protoc ts-proto vite@2.8
+            pushd flutter/web/js
+            yarn install && yarn build
+            popd
+          else
+            echo "No JS bridge sources in web_deps; using the prebuilt bridge."
+          fi
+
+      - name: Point bridge at SwivDesk servers and brand the shell
+        shell: bash
+        run: |
+          cd flutter/web
+          grep -rl --include='*.js' --include='*.html' --include='*.json' --include='*.mjs' "rs-ny.rustdesk.com" . | xargs -r sed -i 's/rs-ny\.rustdesk\.com/remote.swivdesk.com/g'
+          grep -rl --include='*.js' --include='*.html' --include='*.json' --include='*.mjs' "api.rustdesk.com" . | xargs -r sed -i 's/api\.rustdesk\.com/remote.swivdesk.com/g'
+          sed -i 's/<title>[^<]*<\/title>/<title>SwivDesk<\/title>/' index.html
+          sed -i 's/"name": "[^"]*"/"name": "SwivDesk"/; s/"short_name": "[^"]*"/"short_name": "SwivDesk"/' manifest.json || true
+          cp ../../res/web-favicon.png favicon.png
+          cp ../../res/web-icon-192.png icons/Icon-192.png || true
+          cp ../../res/web-icon-512.png icons/Icon-512.png || true
+          cp ../../res/web-icon-192.png icons/Icon-maskable-192.png || true
+          cp ../../res/web-icon-512.png icons/Icon-maskable-512.png || true
+
+      - name: Build web
+        shell: bash
+        run: |
+          pushd flutter
+          flutter build web --release --base-href /client/
+          popd
+
+      - name: Report leftover public-server strings
+        shell: bash
+        run: |
+          echo "rs-ny files: $(grep -rl 'rs-ny' flutter/build/web | wc -l)"
+          echo "api.rustdesk files: $(grep -rl 'api.rustdesk' flutter/build/web | wc -l)"
+          echo "remote.swivdesk files: $(grep -rl 'remote.swivdesk.com' flutter/build/web | wc -l)"
+
+      - name: Upload web client
+        uses: actions/upload-artifact@v4
+        with:
+          name: swivdesk-web-client
+          path: flutter/build/web

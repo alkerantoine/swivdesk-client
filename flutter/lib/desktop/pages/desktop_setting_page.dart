@@ -2580,7 +2580,7 @@ class _AboutState extends State<_About> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Based on the RustDesk open-source project.\nCopyright © ${DateTime.now().toString().substring(0, 4)} Purslane Tech Pte. Ltd. and contributors.\n$license',
+                            'Copyright © ${DateTime.now().toString().substring(0, 4)} Purslane Tech Pte. Ltd. and contributors.\n$license',
                             style: const TextStyle(color: Colors.white),
                           ),
                           Text(
