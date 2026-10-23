@@ -51,7 +51,17 @@ jobs:
           tar xzf web_deps.tar.gz
           rm -f web_deps.tar.gz
           popd
-          ls flutter/web
+          find flutter/web -maxdepth 2 -type f | head -40
+          echo "== files mentioning rustdesk.com =="
+          grep -rlI "rustdesk.com" flutter/web || true
+
+      - name: Point bridge sources at SwivDesk servers
+        shell: bash
+        run: |
+          grep -rlI "rs-ny.rustdesk.com" flutter/web | xargs -r sed -i 's/rs-ny\.rustdesk\.com/remote.swivdesk.com/g' || true
+          grep -rlI "api.rustdesk.com" flutter/web | xargs -r sed -i 's/api\.rustdesk\.com/remote.swivdesk.com/g' || true
+          echo "patched sources; remaining:"
+          grep -rlI "rustdesk.com" flutter/web || echo "none"
 
       - name: Build JS bridge (if sources present)
         shell: bash
@@ -69,8 +79,8 @@ jobs:
         shell: bash
         run: |
           cd flutter/web
-          grep -rl --include='*.js' --include='*.html' --include='*.json' --include='*.mjs' "rs-ny.rustdesk.com" . | xargs -r sed -i 's/rs-ny\.rustdesk\.com/remote.swivdesk.com/g'
-          grep -rl --include='*.js' --include='*.html' --include='*.json' --include='*.mjs' "api.rustdesk.com" . | xargs -r sed -i 's/api\.rustdesk\.com/remote.swivdesk.com/g'
+          grep -rlI "rs-ny.rustdesk.com" . | xargs -r sed -i 's/rs-ny\.rustdesk\.com/remote.swivdesk.com/g' || true
+          grep -rlI "api.rustdesk.com" . | xargs -r sed -i 's/api\.rustdesk\.com/remote.swivdesk.com/g' || true
           sed -i 's/<title>[^<]*<\/title>/<title>SwivDesk<\/title>/' index.html
           sed -i 's/"name": "[^"]*"/"name": "SwivDesk"/; s/"short_name": "[^"]*"/"short_name": "SwivDesk"/' manifest.json || true
           cp ../../res/web-favicon.png favicon.png
