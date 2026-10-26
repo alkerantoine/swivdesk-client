@@ -1018,18 +1018,19 @@ pub fn is_modifier(evt: &KeyEvent) -> bool {
 }
 
 pub fn check_software_update() {
-    if is_custom_client() {
-        return;
-    }
-    let opt = LocalConfig::get_option(keys::OPTION_ENABLE_CHECK_UPDATE);
-    if config::option2bool(keys::OPTION_ENABLE_CHECK_UPDATE, &opt) {
-        std::thread::spawn(move || allow_err!(do_check_software_update()));
-    }
+    // SwivDesk: update checks are disabled. There is no SwivDesk version
+    // endpoint yet, so the client must never contact the upstream version
+    // service. Kept as a no-op (rather than removed) so existing callers
+    // keep compiling; restore the version-check spawn below once a
+    // SwivDesk endpoint exists.
+    return;
 }
 
-// No need to check `danger_accept_invalid_cert` for now.
-// Because the url is always `https://api.rustdesk.com/version/latest`.
+// SwivDesk: unreachable while check_software_update() above is a no-op.
+// The upstream version URL lives in hbb_common::version_check_request
+// and is never called.
 #[tokio::main(flavor = "current_thread")]
+#[allow(dead_code)]
 pub async fn do_check_software_update() -> hbb_common::ResultType<()> {
     let (request, url) =
         hbb_common::version_check_request(hbb_common::VER_TYPE_RUSTDESK_CLIENT.to_string());
