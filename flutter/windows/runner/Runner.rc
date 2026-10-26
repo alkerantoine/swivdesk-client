@@ -92,9 +92,9 @@ BEGIN
             VALUE "CompanyName", "SwivDesk" "\0"
             VALUE "FileDescription", "SwivDesk Support" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "rustdesk" "\0"
+            VALUE "InternalName", "SwivDesk-Support" "\0"
             VALUE "LegalCopyright", "Copyright (c) 2026 SwivDesk. All rights reserved." "\0"
-            VALUE "OriginalFilename", "rustdesk.exe" "\0"
+            VALUE "OriginalFilename", "SwivDesk-Support.exe" "\0"
             VALUE "ProductName", "SwivDesk Support" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
