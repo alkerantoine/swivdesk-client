@@ -314,9 +314,12 @@ class _ConnectionPageState extends State<ConnectionPage>
                 Flexible(child: _buildRemoteIDTextField(context)),
               ],
             ).marginOnly(top: 22),
-            SizedBox(height: 12),
-            Divider().paddingOnly(right: 12),
-            Expanded(child: PeerTabPage()),
+            // SwivDesk web: no peer tabs (the console fills the ID, and
+            // there is no account backend behind them). The divider below
+            // the ID field only separated the field from the tabs.
+            if (!isWeb) SizedBox(height: 12),
+            if (!isWeb) Divider().paddingOnly(right: 12),
+            if (!isWeb) Expanded(child: PeerTabPage()),
           ],
         ).paddingOnly(left: 12.0)),
         if (!isOutgoingOnly) const Divider(height: 1),
