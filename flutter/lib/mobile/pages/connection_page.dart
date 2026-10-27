@@ -88,10 +88,13 @@ class _ConnectionPageState extends State<ConnectionPage> {
             Obx(() => _buildUpdateUI(stateGlobal.updateUrl.value)),
           _buildRemoteIDTextField(),
         ])),
-        SliverFillRemaining(
-          hasScrollBody: true,
-          child: PeerTabPage(),
-        )
+        // SwivDesk web: no peer tabs (the console fills the ID, and
+        // there is no account backend behind them).
+        if (!isWeb)
+          SliverFillRemaining(
+            hasScrollBody: true,
+            child: PeerTabPage(),
+          )
       ],
     ).marginOnly(top: 2, left: 10, right: 10);
   }
