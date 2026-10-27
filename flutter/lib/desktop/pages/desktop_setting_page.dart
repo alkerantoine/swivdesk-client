@@ -68,9 +68,8 @@ class DesktopSettingPage extends StatefulWidget {
         !bind.isDisableSettings() &&
         bind.mainGetBuildinOption(key: kOptionHideSecuritySetting) != 'Y')
       SettingsTabKey.safety,
-    if (!bind.isDisableSettings() &&
-        bind.mainGetBuildinOption(key: kOptionHideNetworkSetting) != 'Y')
-      SettingsTabKey.network,
+    // SwivDesk: no Network tab (clients ship preconfigured to SwivDesk;
+    // the server must not be repointable from settings).
     if (!bind.isIncomingOnly()) SettingsTabKey.display,
     // SwivDesk web: no account backend, so no Account tab.
     if (!bind.isDisableAccount() && !isWeb) SettingsTabKey.account,
