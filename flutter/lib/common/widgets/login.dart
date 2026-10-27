@@ -702,6 +702,10 @@ Future<bool?>? _activeLoginDialog;
 
 // call this directly
 Future<bool?> loginDialog() {
+  // SwivDesk web: the OSS server has no account backend, so this dialog
+  // can never succeed. Never open it on web; callers treat a null result
+  // as "not logged in" and carry on.
+  if (isWeb) return Future.value(null);
   final activeDialog = _activeLoginDialog;
   if (activeDialog != null) {
     return activeDialog;

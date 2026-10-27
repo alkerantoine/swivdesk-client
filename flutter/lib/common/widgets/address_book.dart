@@ -40,6 +40,9 @@ class _AddressBookState extends State<AddressBook> {
   @override
   Widget build(BuildContext context) => Obx(() {
         if (!gFFI.userModel.isLogin) {
+          // SwivDesk web: no account backend, so no login button. The
+          // address book tab stays empty on web.
+          if (isWeb) return const SizedBox.shrink();
           return Center(
               child: ElevatedButton(
                   onPressed: loginDialog, child: Text(translate("Login"))));

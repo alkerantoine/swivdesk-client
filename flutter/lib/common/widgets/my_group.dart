@@ -31,6 +31,9 @@ class _MyGroupState extends State<MyGroup> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (!gFFI.userModel.isLogin) {
+        // SwivDesk web: no account backend, so no login button. The
+        // group tab stays empty on web.
+        if (isWeb) return const SizedBox.shrink();
         return Center(
             child: ElevatedButton(
                 onPressed: loginDialog, child: Text(translate("Login"))));
