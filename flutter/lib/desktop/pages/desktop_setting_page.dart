@@ -72,7 +72,8 @@ class DesktopSettingPage extends StatefulWidget {
         bind.mainGetBuildinOption(key: kOptionHideNetworkSetting) != 'Y')
       SettingsTabKey.network,
     if (!bind.isIncomingOnly()) SettingsTabKey.display,
-    if (!bind.isDisableAccount()) SettingsTabKey.account,
+    // SwivDesk web: no account backend, so no Account tab.
+    if (!bind.isDisableAccount() && !isWeb) SettingsTabKey.account,
     if (isWindows &&
         !bind.isDisableSettings() &&
         bind.mainGetBuildinOption(key: kOptionHideRemotePrinterSetting) != 'Y')
@@ -2568,7 +2569,8 @@ class _AboutState extends State<_About> {
                     translate('Website'),
                     style: linkStyle,
                   ).marginSymmetric(vertical: 4.0)),
-              Container(
+              // SwivDesk web: hide the vendor branding footer.
+              if (!isWeb) Container(
                 decoration: const BoxDecoration(color: Color(0xFF2c8cff)),
                 padding:
                     const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
@@ -2594,7 +2596,7 @@ class _AboutState extends State<_About> {
                     ),
                   ],
                 )),
-              ).marginSymmetric(vertical: 4.0)
+              ).marginSymmetric(vertical: 4.0),
             ],
           ).marginOnly(left: _kContentHMargin)
         ]),
